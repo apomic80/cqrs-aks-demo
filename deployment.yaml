@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mycms-svc
+spec:
+  selector:
+    app: mycms
+    version: v1
+  type: LoadBalancer
+  ports:
+  - port:  80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mycms-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mycms
+  template:
+    metadata:
+      labels:
+        app: mycms
+        zone: prod
+        version: v1
+    spec:
+      containers:
+        - name: mycms
+          image:  apomic80/mycms:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: DEVELOPMENT
+            - name: "SA_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: mssql
+                  key: SA_PASSWORD 
+            - name: SQLSERVER_CONNECTIONSTRING
+              value: "Server=db-sqlserver-svc;Database=mycms;User=sa;Password={password};MultipleActiveResultSets=true;"
