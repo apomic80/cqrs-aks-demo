@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mycms-svc
+  name: mycms-be-svc
 spec:
   selector:
-    app: mycms
+    app: mycms-be
     version: v1
   type: LoadBalancer
   ports:
@@ -13,32 +13,84 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mycms-deployment
+  name: mycms-be-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: mycms
+      app: mycms-be
   template:
     metadata:
       labels:
-        app: mycms
+        app: mycms-be
         zone: prod
         version: v1
     spec:
       containers:
         - name: mycms
-          image:  apomic80/mycms:v1
+          image:  apomic80/mycms-be:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: DEVELOPMENT
-            - name: "SA_PASSWORD"
+            - name: SA_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mssql
                   key: SA_PASSWORD 
             - name: SQLSERVER_CONNECTIONSTRING
               value: "Server=db-sqlserver-svc;Database=mycms;User=sa;Password={password};MultipleActiveResultSets=true;"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password 
+            - name: REDIS_CONNECTIONSTRING
+              value: "redis-master.default.svc.cluster.local:6379,password={password},ssl=False,abortConnect=False"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mycms-fe-svc
+spec:
+  selector:
+    app: mycms-fe
+    version: v1
+  type: LoadBalancer
+  ports:
+  - port:  80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mycms-fe-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mycms-fe
+  template:
+    metadata:
+      labels:
+        app: mycms-fe
+        zone: prod
+        version: v1
+    spec:
+      containers:
+        - name: mycms
+          image:  apomic80/mycms-fe:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: DEVELOPMENT
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password 
+            - name: REDIS_CONNECTIONSTRING
+              value: "redis-slave.default.svc.cluster.local:6379,password={password},ssl=False,abortConnect=False"
