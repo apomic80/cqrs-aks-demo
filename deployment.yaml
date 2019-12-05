@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: mycms-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: mycms
