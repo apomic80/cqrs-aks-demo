@@ -28,6 +28,7 @@ namespace mycms_denormalizer_redis
         {
             this.logger = loggerFactory.CreateLogger<FrontendDenormalizerToRedis>();
             this.initRabbitMQ();
+            this.initRedis();
         }
 
         private void initRedis()
@@ -35,7 +36,7 @@ namespace mycms_denormalizer_redis
             var redisConnString = Environment.GetEnvironmentVariable("REDIS_CONNECTIONSTRING");
             var password = Environment.GetEnvironmentVariable("REDIS_PASSWORD");
             redisConnString = redisConnString.Replace("{password}", password);
-            IDatabase cache = ConnectionMultiplexer.Connect(redisConnString).GetDatabase();
+            cache = ConnectionMultiplexer.Connect(redisConnString).GetDatabase();
         }
 
         private void initRabbitMQ()
@@ -69,7 +70,6 @@ namespace mycms_denormalizer_redis
                 var body = ea.Body;
                 var message = Encoding.UTF8.GetString(body);
                 Process(message);
-                Console.WriteLine(" [x] {0}", message);
             };
             channel.BasicConsume(queue: queueName,
                                  autoAck: true,

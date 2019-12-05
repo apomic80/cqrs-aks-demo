@@ -42,4 +42,4 @@ spec:
                   name: redis
                   key: redis-password
             - name: REDIS_CONNECTIONSTRING
-              value: "redis-slave.default.svc.cluster.local:6379,password={password},ssl=False,abortConnect=False"
+              value: "redis-master.default.svc.cluster.local:6379,password={password},ssl=False,abortConnect=False"
