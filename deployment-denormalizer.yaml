@@ -1,55 +1,45 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: mycms-be2-svc
-spec:
-  selector:
-    app: mycms-be
-    version: v2
-  type: LoadBalancer
-  ports:
-  - port:  80
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mycms-be-deployment
+  name: mycms-denormalizer-redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mycms-be
+      app: mycms-denormalizer-redis
   template:
     metadata:
       labels:
-        app: mycms-be2
+        app: mycms-denormalizer-redis
         zone: prod
-        version: v2
+        version: v1
     spec:
       containers:
-        - name: mycms
-          image:  apomic80/mycms-be:v2
+        - name: mycms-denormalizer-redis
+          image: apomic80/mycms-denormalizer-redis:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: DEVELOPMENT
-            - name: SA_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mssql
-                  key: SA_PASSWORD 
-            - name: SQLSERVER_CONNECTIONSTRING
-              value: "Server=db-sqlserver-svc;Database=mycms;User=sa;Password={password};MultipleActiveResultSets=true;"
             - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rabbitmq
-                  key: rabbitmq-password 
+                  key: rabbitmq-password
             - name: RABBIT_USER
               value: "user"
             - name: RABBIT_PORT
               value: "5672"
             - name: RABBIT_HOSTNAME
               value: "rabbitmq.default.svc.cluster.local"
+            - name: FRONTEND_QUEUE_NAME
+              value: "frontend"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password
+            - name: REDIS_CONNECTIONSTRING
+              value: "redis-slave.default.svc.cluster.local:6379,password={password},ssl=False,abortConnect=False"
