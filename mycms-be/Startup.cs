@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using mycms.Data;
 using mycms_shared.Infrastructure;
 using mycms.Models.ApplicationServices;
+using RabbitMQ.Client;
 
 namespace mycms
 {
@@ -33,13 +34,18 @@ namespace mycms
             services.AddTransient(typeof(IRepository<,>), typeof(EFRepository<,>));
             services.AddTransient<IArticlesApplicationService, ArticlesApplicationService>();
             
-            var conn = Configuration.GetValue<string>("AppSettings:ServiceBusConnectionString");
+            var factory = new ConnectionFactory()
+                {
+                    HostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME"),
+                    UserName = Environment.GetEnvironmentVariable("RABBIT_USER"),
+                    Password = Environment.GetEnvironmentVariable("RABBIT_PASSWORD"),
+                    Port = int.Parse(Environment.GetEnvironmentVariable("RABBIT_PORT"))
+                };
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.ExchangeDeclare(exchange: "mycms", type: ExchangeType.Fanout);
             
-            services.AddSingleton<ITopicClient>(
-                new TopicClient(
-                    Configuration.GetValue<string>("AppSettings:ServiceBusConnectionString"),
-                    Configuration.GetValue<string>("AppSettings:TopicName")
-                    ));
+            services.AddSingleton<IModel>(channel);
 
             services.AddControllersWithViews();
         }

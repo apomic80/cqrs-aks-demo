@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/mycms/bin/Debug/netcoreapp3.0/mycms.dll",
+            "program": "${workspaceFolder}/mycms-denormalizer-redis/bin/Debug/netcoreapp3.0/mycms-denormalizer-redis.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/mycms",
+            "cwd": "${workspaceFolder}/mycms-denormalizer-redis",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {

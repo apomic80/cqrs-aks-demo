@@ -7,20 +7,21 @@ using mycms_shared.Entities;
 using mycms_shared.Infrastructure;
 using mycms.Models.ViewModels.Articles;
 using mycms_shared.Events;
+using RabbitMQ.Client;
 
 namespace mycms.Models.ApplicationServices
 {
     public class ArticlesApplicationService : IArticlesApplicationService
     {
         private readonly IRepository<Article, int> repository = null;
-        private readonly ITopicClient topicClient = null;
+        private readonly IModel channel = null;
 
         public ArticlesApplicationService(
             IRepository<Article, int> repository,
-            ITopicClient topicClient)
+            IModel channel)
         {
             this.repository = repository;
-            this.topicClient = topicClient;
+            this.channel = channel;
         }
         
         public IEnumerable<ArticleListItemViewModel> GetAll()
@@ -91,7 +92,10 @@ namespace mycms.Models.ApplicationServices
                 Operation = operation
             };
             var json = JsonSerializer.Serialize(crudEvent);
-            this.topicClient.SendAsync(new Message(Encoding.UTF8.GetBytes(json)));
+            channel.BasicPublish(exchange: "mycms",
+                                 routingKey: "",
+                                 basicProperties: null,
+                                 body: Encoding.UTF8.GetBytes(json));
         }
     }
 }
