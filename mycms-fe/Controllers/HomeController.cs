@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using mycms.Data.Entities;
-using mycms.Data.Infrastructure;
+using mycms_shared.Entities;
+using mycms_shared.Infrastructure;
 using mycms.Models;
 using mycms.Models.ViewModels.Home;
 

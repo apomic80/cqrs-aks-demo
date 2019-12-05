@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
-using Microsoft.Extensions.Caching.Distributed;
-using mycms.Data.Infrastructure;
+using mycms_shared.Infrastructure;
 using StackExchange.Redis;
 
 namespace mycms_fe.Data

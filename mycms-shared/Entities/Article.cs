@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace mycms.Data.Entities
+namespace mycms_shared.Entities
 {
     public class Article
     {

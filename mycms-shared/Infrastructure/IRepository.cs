@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace mycms.Data.Infrastructure
+namespace mycms_shared.Infrastructure
 {
     public interface IRepository<T, K> : IDisposable
         where T : class

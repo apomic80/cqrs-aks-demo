@@ -1,18 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using mycms.Data;
-using mycms.Data.Infrastructure;
+using mycms_shared.Infrastructure;
 using mycms.Models.ApplicationServices;
-using StackExchange.Redis;
 
 namespace mycms
 {
@@ -36,20 +32,16 @@ namespace mycms
 
             services.AddTransient(typeof(IRepository<,>), typeof(EFRepository<,>));
             services.AddTransient<IArticlesApplicationService, ArticlesApplicationService>();
+            
+            var conn = Configuration.GetValue<string>("AppSettings:ServiceBusConnectionString");
+            
+            services.AddSingleton<ITopicClient>(
+                new TopicClient(
+                    Configuration.GetValue<string>("AppSettings:ServiceBusConnectionString"),
+                    Configuration.GetValue<string>("AppSettings:TopicName")
+                    ));
 
             services.AddControllersWithViews();
-
-            var redisConnString = Environment.GetEnvironmentVariable("REDIS_CONNECTIONSTRING");
-            var redisPassword = Environment.GetEnvironmentVariable("REDIS_PASSWORD");
-            redisConnString = redisConnString.Replace("{password}", redisPassword);
-            
-            IDatabase database = ConnectionMultiplexer.Connect(redisConnString).GetDatabase();
-            services.AddSingleton<IDatabase>(database);
-
-            /*services.AddDistributedRedisCache(cfg => 
-            {
-                cfg.Configuration = Configuration.GetConnectionString("RedisConnection");
-            });*/
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

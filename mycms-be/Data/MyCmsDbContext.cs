@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using mycms.Data.Entities;
+using mycms_shared.Entities;
 
 namespace mycms.Data
 {
