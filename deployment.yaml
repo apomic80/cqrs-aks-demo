@@ -13,12 +13,12 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mycms-be-deployment
+  name: mycms-be2-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mycms-be
+      app: mycms-be2
   template:
     metadata:
       labels:
