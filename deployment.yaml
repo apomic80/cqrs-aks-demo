@@ -4,7 +4,7 @@ metadata:
   name: mycms-be2-svc
 spec:
   selector:
-    app: mycms-be
+    app: mycms-be2
     version: v2
   type: LoadBalancer
   ports:
